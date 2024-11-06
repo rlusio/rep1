@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+####!/usr/bin/env python
 # coding: utf-8
 
 # In[1]:
@@ -86,7 +86,7 @@ class Bank:
                 logging.info(f"{currency}: {amount}")
     
     @staticmethod
-    def exchange_calculator(amount: float or int, from_this: str, to_this: str):
+    def exchange_calculator(amount: float|int, from_this: str, to_this: str):
         try: 
             if (from_this,  to_this) in Bank.exchange_rates:
                 rate = Bank.exchange_rates[(from_this,  to_this)]
@@ -97,7 +97,7 @@ class Bank:
             logging.info(f"Exchange from {from_this} to {to_this} is not available.")
     
     @check_positive
-    def exchange(self, client: Client, amount: float or int, from_this: str, to_this: str):
+    def exchange(self, client: Client, amount: float|int, from_this: str, to_this: str):
         try:
             start_time = time.time()
             transaction_delay = max(random.gauss(3, 2),0)
@@ -108,15 +108,16 @@ class Bank:
                     client.balance[to_this] = client.balance.get(to_this, 0) + converted_amount
                     time.sleep(transaction_delay)
                     transaction_time = round((time.time() - start_time),2)
-                    logging.info(f"{client.name} Exchanged {amount} {from_this} to {converted_amount:.2f} {to_this}. Transaction took {transaction_time} s")
+                    return transaction_time
+                    #logging.info(f"{client.name} Exchanged {amount} {from_this} to {converted_amount:.2f} {to_this}. Transaction took {transaction_time} s")
             else:
                 raise InsufficientFundsOrNoCurrencyError
         except InsufficientFundsOrNoCurrencyError:
             logging.info(f"Insufficient funds or currency not available in client balance.")
-    
-def multi_exchange(args):
-    bank, client, amount, from_this, to_this = args
-    bank.exchange(client, amount, from_this, to_this)
+        
+    def multi_exchange(self, args):
+        client, amount, from_this, to_this = args
+        self.exchange(client, amount, from_this, to_this)
 
 
 # In[ ]:
@@ -137,18 +138,20 @@ if __name__ == "__main__":
     bank.append_client(client2)
     bank.append_client(client3)
     bank.money_count()
-    bank.exchange(client1, 10, "euro", "zloty")
+    #bank.exchange(client1, 10, "euro", "zloty")
+    for c in bank.database:
+        print(c)
     multi_tasks = [
-            (bank, client1, 90, "euro", "dolar"),
-            (bank, client2, 50, "zloty", "pound"),
-            (bank, client4, 1, "pound", "zloty"),
+            (client1, 90, "euro", "dolar"),
+            (client2, 50, "zloty", "pound"),
+            (client4, 1, "pound", "zloty"),
     ]
     with Pool() as pool:
-        pool.map(multi_exchange, multi_tasks)
+        pool.map
+        pool.map(bank.multi_exchange, multi_tasks)
+    for c in bank.database:
+        print(c)
     
-    print(f"Updated balance for {client1.name}: {client1.balance}")
-    print(f"Updated balance for {client2.name}: {client2.balance}")
-    print(f"Updated balance for {client4.name}: {client4.balance}")
 
 
 # In[ ]:
