@@ -57,11 +57,12 @@ class Bank:
     
     def load_clients(self, filename="clients.json"):
         try:
-            with open(filename, "r") as file:
+            with open(filename, "r",  encoding="utf-8") as file:
                 clients_data = json.load(file)
                 for data in clients_data:
                     client = Client(data["name"], data["balance"])
                     self.append_client(client)
+                logging.info("Clients loaded!")
         except FileNotFoundError:
             logging.info("Clients file not found. No clients loaded.")
     
@@ -129,6 +130,8 @@ if __name__ == "__main__":
     bank.exchange(client2, 50, "zloty", "pound")
     bank.money_count()
     print(client2.balance)
+    bank.save_clients("clients.txt")
+    bank.load_clients("read.txt")
     #multi_tasks = [
             #(bank, client1, 90, "euro", "dolar"),
             #(bank, client2, 50, "zloty", "pound"),
@@ -136,6 +139,9 @@ if __name__ == "__main__":
     #]
     #with Pool() as pool:
         #pool.map(multi_exchange, multi_tasks)
+
+
+
 
 
 
