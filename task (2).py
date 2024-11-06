@@ -79,7 +79,7 @@ class Bank:
                 logging.info(f"{currency}: {amount:.2f}")
     
     @staticmethod
-    def exchange_calculator(amount: float or int, from_this: str, to_this: str):
+    def exchange_calculator(amount: float | int, from_this: str, to_this: str):
         try: 
             if (from_this,  to_this) in Bank.exchange_rates:
                 rate = Bank.exchange_rates[(from_this,  to_this)]
@@ -90,7 +90,7 @@ class Bank:
             logging.info(f"Exchange from {from_this} to {to_this} is not available.")
     
     @check_positive
-    def exchange(self, client: Client, amount: float or int, from_this: str, to_this: str):
+    def exchange(self, client: Client, amount: float | int, from_this: str, to_this: str):
         try:
             start_time = time.time()
             transaction_delay = max(random.gauss(3, 2),0)
@@ -98,7 +98,9 @@ class Bank:
                 converted_amount = self.exchange_calculator(amount, from_this, to_this)
                 if converted_amount is not None:
                     client.balance[from_this] -= amount
-                    client.balance[to_this] = client.balance.get(to_this, 0) + converted_amount
+                    if to_this not in client.balance:
+                        client.balance[to_this] = 0
+                    client.balance[to_this] += converted_amount
                     time.sleep(transaction_delay)
                     transaction_time = round((time.time() - start_time),2)
                     logging.info(f"{client.name} Exchanged {amount} {from_this} to {converted_amount:.2f} {to_this}. Transaction took {transaction_time} s")
@@ -106,6 +108,9 @@ class Bank:
                 raise InsufficientFundsOrNoCurrencyError
         except InsufficientFundsOrNoCurrencyError:
             logging.info(f"Insufficient funds or currency not available in client balance.")
+
+#def multi_exchange(bank, client, amount, from_this, to_this = args):
+    #bank.exchange(client, amount, from_this, to_this)
 
 if __name__ == "__main__":
     logging.basicConfig(format="{message}",
@@ -135,15 +140,10 @@ if __name__ == "__main__":
     #multi_tasks = [
             #(bank, client1, 90, "euro", "dolar"),
             #(bank, client2, 50, "zloty", "pound"),
-            #(bank, client4, 1, "pound", "zloty"),
+            #(bank, client4, 1, "euro", "zloty"),
     #]
     #with Pool() as pool:
         #pool.map(multi_exchange, multi_tasks)
-
-
-
-
-
 
 
 
